@@ -45,6 +45,9 @@ public class EntityManager : MonoBehaviour
             tile.SetNeighbor(Tile.TileDirections.S, tiles[i - 1]);
             tiles[i - 1].SetNeighbor(Tile.TileDirections.N, tile);
         }
+
+        //Elevation 
+
         return true;
     }
 

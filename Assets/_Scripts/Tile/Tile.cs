@@ -5,9 +5,11 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
+
 [SelectionBase]
 public class Tile : MonoBehaviour
 {
+    public int elevation;
     public int x;
     public int y;
     public Color matColor;
@@ -59,6 +61,13 @@ public class Tile : MonoBehaviour
         this.y = y;
     }
 
+    public void setElevation(float elevation)
+    {
+        transform.position = transform.position + new Vector3(0, elevation, 0);
+        this.elevation = (int)(elevation / TileConstants.heightStep);
+    }
+
+   
     public void setColor()
     {
         Gradient g = new Gradient();

@@ -23,6 +23,12 @@ public class WaterTile : Tile
         RandomizeTile();
     }
 
+
+    void onEnable()
+    {
+
+    }
+
     // Update is called once per frame
     void Update()
     {
