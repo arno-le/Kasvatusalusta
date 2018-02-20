@@ -115,7 +115,7 @@ public class GroundGenerator : MonoBehaviour
     {
         if (!tile) return false;
         tiles.Add(tile);
-        Debug.Log(tiles.Count);
+        //Debug.Log(tiles.Count);
         tile.setCoordinates(x, y);
         if (x > 0)
         {
@@ -162,7 +162,7 @@ public class GroundGenerator : MonoBehaviour
     bool checkNeighborElevation(Tile tile, float suggested)
     {
         int diff = (int)(suggested / TileConstants.heightStep);
-        Debug.Log(diff);
+      //  Debug.Log(diff);
         foreach (Tile neighbor in tile.neighbors)
         {
 
