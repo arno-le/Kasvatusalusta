@@ -4,6 +4,7 @@ namespace UnityEngine.PostProcessing
 {
     public class DayNightController : MonoBehaviour
     {
+        public bool active = true;
         public Light sun;
         public Light moon;
         [HideInInspector]
@@ -52,25 +53,29 @@ namespace UnityEngine.PostProcessing
 
         void Update()
         {
-            UpdateSun();
-            UpdateMoon();
-            currentTimeOfDay += (Time.deltaTime / secondsInFullDay) * timeMultiplier;
-            if (currentTimeOfDay >= 1)
+            if(active)
             {
-                currentTimeOfDay = 0;
-                doEveningRoutine = false;
-                doMorningRoutine = false;
-            }
-            // Evening
-            else if (currentTimeOfDay > 0.6 && !doEveningRoutine)
-            {
-                doEveningStuff();
-                doEveningRoutine = true;
-            }
-            else if (currentTimeOfDay > 0.27 && !doMorningRoutine)
-            {
-                doMorningStuff();
-                doMorningRoutine = true;
+                UpdateSun();
+                UpdateMoon();
+                currentTimeOfDay += (Time.deltaTime / secondsInFullDay) * timeMultiplier;
+                if (currentTimeOfDay >= 1)
+                {
+                    currentTimeOfDay = 0;
+                    doEveningRoutine = false;
+                    doMorningRoutine = false;
+                }
+                // Evening
+                else if (currentTimeOfDay > 0.6 && !doEveningRoutine)
+                {
+                    doEveningStuff();
+                    doEveningRoutine = true;
+                }
+                else if (currentTimeOfDay > 0.27 && !doMorningRoutine)
+                {
+                    doMorningStuff();
+                    doMorningRoutine = true;
+                }
+
             }
 
 

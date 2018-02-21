@@ -29,6 +29,12 @@ public class GroundGenerator : MonoBehaviour
         RandomizeMap();
     }
 
+    void floatyRotate()
+    {
+        transform.rotation = Quaternion.Euler(0f, -.5f, 0f);
+        LeanTween.rotateY(gameObject, 0.5f, 15f).setEaseInOutQuad().setLoopPingPong();
+    }
+
     public void RandomizeMap()
     {
         // Remove previous map
@@ -74,6 +80,8 @@ public class GroundGenerator : MonoBehaviour
             }
             currentPos = new Vector3(0f, 0f);
         }
+       // floatyRotate();
+
     }
 
     Vector3 GenerateTile(Vector3 currentPos, int x, int y, int i)
