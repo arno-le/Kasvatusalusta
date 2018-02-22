@@ -80,10 +80,15 @@ public class GroundGenerator : MonoBehaviour
             {
                 currentPos = GenerateTile(currentPos, x, y, i);
                 ++i;
-            }
 
+            }
+            if(Random.Range(0f, 1f) > 0.5f) --islandHeight;
+            if(Random.Range(0f, 1f) > 0.9f) ++islandHeight;
+            if(Random.Range(0f, 1f) > 0.8f) --islandWidth;
+            if(Random.Range(0f, 1f) > 0.9f) ++islandWidth;
             currentPos = currentPos + new Vector3(3f, 0f);
             currentPos.z = 0f;
+            currentPos.z = Random.Range(-6f, 6f);
             currentPos.y = 0;
         }
 
