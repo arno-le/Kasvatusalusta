@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WaterTile : Tile
 {
-
+    public WaterTileDirection direction;
     public enum WaterTileDirection
     {
         N,
@@ -40,9 +40,11 @@ public class WaterTile : Tile
         if (neighbors[2] is WaterTile)
         {
             tile = Instantiate(variations[(int)WaterTileDirection.S], transform);
+            direction = WaterTileDirection.S;
             return;
         }
         tile = Instantiate(variations[(int)WaterTileDirection.N], transform);
+        direction = WaterTileDirection.N;
 
     }
 }

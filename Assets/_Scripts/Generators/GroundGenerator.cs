@@ -33,6 +33,7 @@ public class GroundGenerator : MonoBehaviour
     {
         transform.rotation = Quaternion.Euler(0f, -.5f, 0f);
         LeanTween.rotateY(gameObject, 0.5f, 15f).setEaseInOutQuad().setLoopPingPong();
+        LeanTween.moveY(gameObject, -1f, 20f).setEaseInOutQuad().setLoopPingPong();
     }
 
     public void RandomizeMap()
@@ -63,7 +64,8 @@ public class GroundGenerator : MonoBehaviour
             currentPos.y = 0;
         }
 
-        GenerateElevation();
+        floatyRotate();
+        // GenerateElevation();
     }
 
     void GenerateElevation()
@@ -80,7 +82,6 @@ public class GroundGenerator : MonoBehaviour
             }
             currentPos = new Vector3(0f, 0f);
         }
-       // floatyRotate();
 
     }
 
@@ -89,6 +90,12 @@ public class GroundGenerator : MonoBehaviour
         // TODO: instantiate tile types based on neighbors
         // For now, only the last generated applies
         float chances = Random.Range(0f, 1f);
+
+        if(entityManager.getLastTile() is WaterTile)
+        {
+        
+            createTileOfType(waterTile, currentPos, x, y, i);
+        }
 
         if (chances < forestProbability)
         {

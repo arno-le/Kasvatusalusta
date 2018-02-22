@@ -5,8 +5,8 @@ using UnityEngine;
 public class EntityManager : MonoBehaviour
 {
 
-    List<Tile> tiles = new List<Tile>();
-    List<GameObject> plants = new List<GameObject>();
+    public List<Tile> tiles;
+    public List<GameObject> plants = new List<GameObject>();
 
     private int width;
     private int height;
@@ -25,15 +25,20 @@ public class EntityManager : MonoBehaviour
             {
                 Destroy(tile);
             }
-            tiles.Clear();
 
         }
+    }
+
+    public Tile getLastTile()
+    {
+        // @Hack
+        Debug.Log(tiles.Count);
+        return tiles.Count > 0 ? tiles[tiles.Count - 1] : new Tile();
     }
 
     public bool addTile(Tile tile, int x, int y, int i)
     {
         if (!tile) return false;
-        tiles.Add(tile);
         tile.setCoordinates(x, y);
         if (x > 0)
         {
@@ -45,6 +50,7 @@ public class EntityManager : MonoBehaviour
             tile.SetNeighbor(Tile.TileDirections.S, tiles[i - 1]);
             tiles[i - 1].SetNeighbor(Tile.TileDirections.N, tile);
         }
+        tiles[i] = tile;
 
         //Elevation 
 
