@@ -8,8 +8,21 @@ using UnityEditor;
 public class GroundGenerator : MonoBehaviour
 {
 
-    public EntityManager entityManager;
+    public Texture2D placeholder;
+    public int islandWidth;
+    public int islandHeight;
+
+    public int bottomWidth;
+    public int bottomHeight;
+
+    public float noiseScale = 0.05f;
+    public int octaves;
+    public float persistence;
+    public float lacunarity;
+
     public int randomSeed = 1;
+
+    public EntityManager entityManager;
     public Tile groundTile;
     public Tile treeTile;
     public Tile rockTile;
@@ -18,8 +31,7 @@ public class GroundGenerator : MonoBehaviour
     public float forestProbability;
     public float waterProbability;
     public float rockProbability;
-    public int xToGenerate;
-    public int yToGenerate;
+
 
     List<Tile> tiles = new List<Tile>();
 
@@ -36,6 +48,14 @@ public class GroundGenerator : MonoBehaviour
         LeanTween.moveY(gameObject, -1f, 20f).setEaseInOutQuad().setLoopPingPong();
     }
 
+
+    public void GenerateIsland()
+    {
+        float[,] noiseMap = Noise.GenerateNoiseMap(bottomWidth, bottomHeight, noiseScale, octaves, persistence, lacunarity);
+        MeshData newIsland = IslandGenerator.GenerateIslandMesh(noiseMap);
+        GetComponent<IslandDisplay>().DrawMesh(newIsland, placeholder);
+    }
+
     public void RandomizeMap()
     {
         // Remove previous map
@@ -49,18 +69,21 @@ public class GroundGenerator : MonoBehaviour
             Debug.Log("Init random with time");
             Random.InitState(System.DateTime.Now.Millisecond);
         }
+       // float topLeftX = (islandWidth - 1) / -2f;
+       // float topLeftZ = (islandHeight - 1) / 2f;
         Vector3 currentPos = new Vector3(0f, 0f, 0f);
+
         int i = 0;
-        for (int x = 0; x < xToGenerate; ++x)
+        for (int x = 0; x < islandWidth; ++x)
         {
-            for (int y = 0; y < yToGenerate; ++y)
+            for (int y = 0; y < islandHeight; ++y)
             {
                 currentPos = GenerateTile(currentPos, x, y, i);
                 ++i;
             }
 
             currentPos = currentPos + new Vector3(3f, 0f);
-            currentPos.z = 0;
+            currentPos.z = 0f;
             currentPos.y = 0;
         }
 
@@ -73,9 +96,9 @@ public class GroundGenerator : MonoBehaviour
         int i = 0;
         Vector3 currentPos = new Vector3(0, 0);
 
-        for (int x = 0; x < xToGenerate; ++x)
+        for (int x = 0; x < islandWidth; ++x)
         {
-            for (int y = 0; y < yToGenerate; ++y)
+            for (int y = 0; y < islandHeight; ++y)
             {
                 currentPos = setElevation(tiles[i], currentPos);
                 ++i;
@@ -91,9 +114,9 @@ public class GroundGenerator : MonoBehaviour
         // For now, only the last generated applies
         float chances = Random.Range(0f, 1f);
 
-        if(entityManager.getLastTile() is WaterTile)
+        if (entityManager.getLastTile() is WaterTile)
         {
-        
+
             createTileOfType(waterTile, currentPos, x, y, i);
         }
 
@@ -134,8 +157,8 @@ public class GroundGenerator : MonoBehaviour
         tile.setCoordinates(x, y);
         if (x > 0)
         {
-            tile.SetNeighbor(Tile.TileDirections.W, tiles[i - xToGenerate]);
-            tiles[i - xToGenerate].SetNeighbor(Tile.TileDirections.E, tile);
+            tile.SetNeighbor(Tile.TileDirections.W, tiles[i - islandWidth]);
+            tiles[i - islandWidth].SetNeighbor(Tile.TileDirections.E, tile);
         }
         if (y > 0)
         {
@@ -147,7 +170,7 @@ public class GroundGenerator : MonoBehaviour
 
     Vector3 setElevation(Tile tile, Vector3 currentPosition)
     {
-        if (tile.x < 1 || tile.y < 1 || tile.x == xToGenerate - 1 || tile.y == yToGenerate - 1)
+        if (tile.x < 1 || tile.y < 1 || tile.x == islandWidth - 1 || tile.y == islandHeight - 1)
         {
             return currentPosition;
         }
@@ -177,11 +200,11 @@ public class GroundGenerator : MonoBehaviour
     bool checkNeighborElevation(Tile tile, float suggested)
     {
         int diff = (int)(suggested / TileConstants.heightStep);
-      //  Debug.Log(diff);
+        //  Debug.Log(diff);
         foreach (Tile neighbor in tile.neighbors)
         {
 
-            if (Mathf.Abs(neighbor.elevation - diff)> 1)
+            if (Mathf.Abs(neighbor.elevation - diff) > 1)
             {
                 Debug.Log("Was false");
                 Debug.Log(neighbor.elevation - diff);
@@ -214,9 +237,9 @@ public class GroundGeneratorEditor : Editor
     {
         base.OnInspectorGUI();
         GroundGenerator generator = (GroundGenerator)target;
-        if (GUILayout.Button("Regenerate map"))
+        if (GUILayout.Button("Generate island"))
         {
-            generator.RandomizeMap();
+            generator.GenerateIsland();
         }
 
     }

@@ -15,7 +15,6 @@ public class GrassTween : MonoBehaviour {
     void Start () {
         gameObject.transform.localRotation = Quaternion.Euler(0f,0f,initialZ);
         float random = Random.Range(0f, initTimeMax);
-        Debug.Log(random);
         LeanTween.delayedCall(gameObject, random, StartAnim);
     }
 

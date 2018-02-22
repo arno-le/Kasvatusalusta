@@ -95,7 +95,6 @@ namespace UnityEngine.PostProcessing
         bool trueOrFalse()
         {
             float random = Random.Range(0f, 1f);
-            Debug.Log(random);
             return random > 0.5f ? true : false;
         }
 

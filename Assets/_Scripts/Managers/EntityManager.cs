@@ -13,8 +13,8 @@ public class EntityManager : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        height = GameObject.FindObjectOfType<GroundGenerator>().yToGenerate;
-        width = GameObject.FindObjectOfType<GroundGenerator>().xToGenerate;
+        height = GameObject.FindObjectOfType<GroundGenerator>().islandHeight;
+        width = GameObject.FindObjectOfType<GroundGenerator>().islandWidth;
     }
 
     public void removeAllTiles()
