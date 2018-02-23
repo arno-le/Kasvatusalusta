@@ -1,12 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 public class GroundGenerator : MonoBehaviour
 {
+
+    public Tile.Season season;
+    public List<Tile> tiles;
 
     public Texture2D placeholder;
     public int islandWidth;
@@ -33,19 +38,45 @@ public class GroundGenerator : MonoBehaviour
     public float rockProbability;
 
 
-    List<Tile> tiles = new List<Tile>();
+    private int initialIslandWidth;
+    private int initialIslandHeight;
 
+    private Dropdown m_Dropdown;
 
     void Start()
     {
-        RandomizeMap();
+        m_Dropdown = FindObjectOfType<Dropdown>();
+       //@Todo: jos tämä ei muuttaisi vuodenaikaa suoraan takaisin kesäksi -.-
+       // m_Dropdown.value = (int)season;
+        m_Dropdown.onValueChanged.AddListener(delegate {
+            SetSeason(m_Dropdown.value);
+        });
+        initialIslandHeight = islandHeight;
+        initialIslandWidth = islandWidth;
+        StartCoroutine(RandomizeEveryXSeconds(5f));
+        floatyRotate();
+    }
+
+    public void EditorGenerate(int width, int height)
+    {
+        initialIslandHeight = height;
+        initialIslandWidth = width;
+        RandomizeTiles();
+    }
+
+    IEnumerator RandomizeEveryXSeconds(float seconds)
+    {
+        while (true)
+        {
+            yield return StartCoroutine(RandomizeMap());
+            yield return new WaitForSecondsRealtime(5f);
+        }
     }
 
     void floatyRotate()
     {
-        transform.rotation = Quaternion.Euler(0f, -.5f, 0f);
-        LeanTween.rotateY(gameObject, 0.5f, 15f).setEaseInOutQuad().setLoopPingPong();
-        LeanTween.moveY(gameObject, -1f, 20f).setEaseInOutQuad().setLoopPingPong();
+        Debug.Log("Rotating");
+        LeanTween.moveY(gameObject, -1.5f, 20f).setEaseInOutQuad().setLoopPingPong();
     }
 
 
@@ -56,10 +87,53 @@ public class GroundGenerator : MonoBehaviour
         GetComponent<IslandDisplay>().DrawMesh(newIsland, placeholder);
     }
 
-    public void RandomizeMap()
+    public IEnumerator RandomizeMap()
+    {
+        yield return StartCoroutine(RemoveAllTiles());
+        //LeanTween.rotateAroundLocal(gameObject, new Vector3(0f, 1f), Random.Range(0f, 360f), 0.0001f);
+        yield return StartCoroutine(RandomizeTiles());
+    }
+
+    public IEnumerator RemoveAllTiles()
+    {
+        Debug.Log("Starting to remove");
+        if (tiles.Count > 0)
+        {
+            foreach (Tile tile in tiles)
+            { 
+                    LeanTween.move(tile.gameObject, new Vector3(0f, 20f), 1f).setEaseInBack();
+                    yield return new WaitForSecondsRealtime(.1f);
+            }
+            yield return new WaitForSecondsRealtime(1f);
+
+            foreach (Tile tile in tiles)
+            {
+                if (Application.isEditor)
+                {
+                    DestroyImmediate(tile.gameObject);
+
+                }
+                else
+                {
+                    Destroy(tile.gameObject);
+                }
+
+            }
+        }
+
+
+        tiles.Clear();
+        Debug.Log("Remove done");
+
+    }
+
+    public IEnumerator RandomizeTiles()
     {
         // Remove previous map
-        entityManager.removeAllTiles();
+        islandWidth = initialIslandWidth;
+        islandHeight = initialIslandHeight;
+        //gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, 0f));
+
         if (randomSeed != 0)
         {
             Random.InitState(randomSeed);
@@ -69,8 +143,8 @@ public class GroundGenerator : MonoBehaviour
             Debug.Log("Init random with time");
             Random.InitState(System.DateTime.Now.Millisecond);
         }
-       // float topLeftX = (islandWidth - 1) / -2f;
-       // float topLeftZ = (islandHeight - 1) / 2f;
+        // float topLeftX = (islandWidth - 1) / -2f;
+        // float topLeftZ = (islandHeight - 1) / 2f;
         Vector3 currentPos = new Vector3(0f, 0f, 0f);
 
         int i = 0;
@@ -80,19 +154,18 @@ public class GroundGenerator : MonoBehaviour
             {
                 currentPos = GenerateTile(currentPos, x, y, i);
                 ++i;
-
+                yield return new WaitForSecondsRealtime(0.1f);
             }
-            if(Random.Range(0f, 1f) > 0.5f) --islandHeight;
-            if(Random.Range(0f, 1f) > 0.9f) ++islandHeight;
-            if(Random.Range(0f, 1f) > 0.8f) --islandWidth;
-            if(Random.Range(0f, 1f) > 0.9f) ++islandWidth;
+            if (Random.Range(0f, 1f) > 0.5f) --islandHeight;
+            if (Random.Range(0f, 1f) > 0.9f) ++islandHeight;
+            if (Random.Range(0f, 1f) > 0.8f) --islandWidth;
+            if (Random.Range(0f, 1f) > 0.9f) ++islandWidth;
             currentPos = currentPos + new Vector3(3f, 0f);
             currentPos.z = 0f;
             currentPos.z = Random.Range(-6f, 6f);
             currentPos.y = 0;
         }
-
-        floatyRotate();
+        Debug.Log("All tiles generated");
         // GenerateElevation();
     }
 
@@ -119,11 +192,12 @@ public class GroundGenerator : MonoBehaviour
         // For now, only the last generated applies
         float chances = Random.Range(0f, 1f);
 
-        if (entityManager.getLastTile() is WaterTile)
-        {
-
-            createTileOfType(waterTile, currentPos, x, y, i);
-        }
+        //WaterTile wTile = (tiles.Count > 0 && tiles[i - 1] is WaterTile) ? (WaterTile)tiles[i - 1] : null;
+        //if (wTile != null && wTile.direction == WaterTile.WaterTileDirection.N)
+        //{
+        //    createTileOfType(waterTile, currentPos, x, y, i);
+        //    return currentPos = currentPos + new Vector3(0f, 0f, 3f);
+        //}
 
         if (chances < forestProbability)
         {
@@ -147,7 +221,10 @@ public class GroundGenerator : MonoBehaviour
     Vector3 createTileOfType(Tile tile, Vector3 currentPosition, int x, int y, int i)
     {
         Tile obj = Instantiate(tile, transform);
-        obj.transform.position = currentPosition;
+        obj.season = season;
+        obj.transform.position = currentPosition + new Vector3(0f,-50f);
+        obj.RandomizeTile();
+        LeanTween.move(obj.gameObject, currentPosition, 2f).setEaseOutQuad();
         addTile(obj, x, y, i);
         return currentPosition;
 
@@ -162,8 +239,9 @@ public class GroundGenerator : MonoBehaviour
         tile.setCoordinates(x, y);
         if (x > 0)
         {
-            tile.SetNeighbor(Tile.TileDirections.W, tiles[i - islandWidth]);
-            tiles[i - islandWidth].SetNeighbor(Tile.TileDirections.E, tile);
+            // @Todo: what to do with this
+            // tile.SetNeighbor(Tile.TileDirections.W, tiles[i - islandWidth]);
+            //  tiles[i - islandWidth].SetNeighbor(Tile.TileDirections.E, tile);
         }
         if (y > 0)
         {
@@ -222,9 +300,13 @@ public class GroundGenerator : MonoBehaviour
         return true;
     }
 
+   public void SetSeason(int season)
+    {
+        Debug.Log("Vuodenaika vaihtui" + season);
+        this.season = (Tile.Season)season;
+    }
 
 
-    // Update is called once per frame
     void Update()
     {
 
@@ -245,6 +327,10 @@ public class GroundGeneratorEditor : Editor
         if (GUILayout.Button("Generate island"))
         {
             generator.GenerateIsland();
+        }
+        if (GUILayout.Button("Randomize tiles"))
+        {
+            generator.EditorGenerate(10, 10);
         }
 
     }

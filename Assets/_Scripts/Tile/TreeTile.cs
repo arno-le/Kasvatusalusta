@@ -5,9 +5,10 @@ using UnityEngine;
 [SelectionBase]
 public class TreeTile : Tile {
 
+
+    public List<Material> FallMaterials = new List<Material>();
 	// Use this for initialization
-	void Start () {
-       if (state == TileStates.DEFAULT) RandomizeTile();
+	void Awake () {
     }
 	
 	// Update is called once per frame

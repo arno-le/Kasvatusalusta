@@ -17,22 +17,8 @@ public class WaterTile : Tile
         NW
     }
 
-    // Use this for initialization
-    void Start()
+    void Awake()
     {
-        RandomizeTile();
-    }
-
-
-    void onEnable()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     public override void RandomizeTile()
@@ -40,11 +26,40 @@ public class WaterTile : Tile
         if (neighbors[2] is WaterTile)
         {
             tile = Instantiate(variations[(int)WaterTileDirection.S], transform);
+            meshRenderer = tile.GetComponentInChildren<MeshRenderer>();
             direction = WaterTileDirection.S;
+            Debug.Log("Water tile direction set to" + direction);
             return;
         }
-        tile = Instantiate(variations[(int)WaterTileDirection.N], transform);
-        direction = WaterTileDirection.N;
+        else
+        {
+            tile = Instantiate(variations[(int)WaterTileDirection.N], transform);
+            direction = WaterTileDirection.N;
+        }
+        switch (season)
+        {
 
+            case Season.SUMMER:
+                SetMaterial(seasonMaterials[(int)Season.SUMMER]);
+                break;
+            case Season.FALL:
+                SetMaterial(seasonMaterials[(int)Season.FALL]);
+                break;
+            case Season.WINTER:
+                SetMaterial(seasonMaterials[(int)Season.WINTER]);
+                break;
+            case Season.SPRING:
+                SetMaterial(seasonMaterials[(int)Season.SPRING]);
+                break;
+        }
     }
+
+    public override void SetMaterial(Material material)
+    {
+        if (meshRenderer == null) return;
+        Material[] mats = meshRenderer.materials;
+        mats[2] = material;
+        meshRenderer.materials = mats;
+    }
+
 }

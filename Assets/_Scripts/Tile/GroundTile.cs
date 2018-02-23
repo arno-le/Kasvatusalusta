@@ -12,22 +12,10 @@ public class GroundTile : Tile
     public GameObject wateringEffect;
     public float speed = 2.0f;
 
-    private MeshRenderer rend;
 
-    void Start()
+    void Awake()
     {
-        rend = gameObject.GetComponent<MeshRenderer>();
-        if (state == TileStates.DEFAULT) RandomizeTile();
-        if (state == TileStates.SHAPED) Instantiate(shapedTile);
-        if (state == TileStates.PLANTED) plantSeeds();
     }
-
-    public override void RandomizeTile()
-    {
-        base.RandomizeTile();
-
-    }
-
 
     public override TileStates interact()
     {

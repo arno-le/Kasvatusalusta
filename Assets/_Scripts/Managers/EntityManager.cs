@@ -29,12 +29,6 @@ public class EntityManager : MonoBehaviour
         }
     }
 
-    public Tile getLastTile()
-    {
-        // @Hack
-        Debug.Log(tiles.Count);
-        return tiles.Count > 0 ? tiles[tiles.Count - 1] : new Tile();
-    }
 
     public bool addTile(Tile tile, int x, int y, int i)
     {
@@ -51,6 +45,7 @@ public class EntityManager : MonoBehaviour
             tiles[i - 1].SetNeighbor(Tile.TileDirections.N, tile);
         }
         tiles[i] = tile;
+        Debug.Log(tiles);
 
         //Elevation 
 
