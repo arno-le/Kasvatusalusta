@@ -42,20 +42,27 @@ public class GroundGenerator : MonoBehaviour
     private int initialIslandHeight;
 
     private Dropdown m_Dropdown;
+    private bool randomizing = false;
 
     void Start()
     {
+        randomizing = false;
         m_Dropdown = FindObjectOfType<Dropdown>();
-       //@Todo: jos tämä ei muuttaisi vuodenaikaa suoraan takaisin kesäksi -.-
-       // m_Dropdown.value = (int)season;
-        m_Dropdown.onValueChanged.AddListener(delegate {
+        //@Todo: jos tämä ei muuttaisi vuodenaikaa suoraan takaisin kesäksi -.-
+        // m_Dropdown.value = (int)season;
+        m_Dropdown.onValueChanged.AddListener(delegate
+        {
             SetSeason(m_Dropdown.value);
         });
         initialIslandHeight = islandHeight;
         initialIslandWidth = islandWidth;
-        StartCoroutine(RandomizeEveryXSeconds(5f));
+        // StartCoroutine(RandomizeEveryXSeconds(5f));
         floatyRotate();
+        StartCoroutine(RandomizeMap());
     }
+
+    // Helper methods
+    #region EditorHelperMethods
 
     public void EditorGenerate(int width, int height)
     {
@@ -64,6 +71,25 @@ public class GroundGenerator : MonoBehaviour
         RandomizeTiles();
     }
 
+
+    public void ToggleRandomizing()
+    {
+        if (randomizing)
+        {
+            StartCoroutine("RandomizeEveryXSeconds");
+            randomizing = true;
+        }
+        else
+        {
+            StopCoroutine("RandomizeEveryXSeconds");
+            randomizing = false;
+        }
+    }
+
+
+
+
+    #endregion
     IEnumerator RandomizeEveryXSeconds(float seconds)
     {
         while (true)
@@ -100,9 +126,9 @@ public class GroundGenerator : MonoBehaviour
         if (tiles.Count > 0)
         {
             foreach (Tile tile in tiles)
-            { 
-                    LeanTween.move(tile.gameObject, new Vector3(0f, 20f), 1f).setEaseInBack();
-                    yield return new WaitForSecondsRealtime(.1f);
+            {
+                LeanTween.move(tile.gameObject, new Vector3(0f, 20f), 1f).setEaseInBack();
+                yield return new WaitForSecondsRealtime(.1f);
             }
             yield return new WaitForSecondsRealtime(1f);
 
@@ -167,6 +193,12 @@ public class GroundGenerator : MonoBehaviour
         }
         Debug.Log("All tiles generated");
         // GenerateElevation();
+        SpawnPlayer();
+    }
+
+    private void SpawnPlayer()
+    {
+        entityManager.SpawnPlayer();
     }
 
     void GenerateElevation()
@@ -222,7 +254,7 @@ public class GroundGenerator : MonoBehaviour
     {
         Tile obj = Instantiate(tile, transform);
         obj.season = season;
-        obj.transform.position = currentPosition + new Vector3(0f,-50f);
+        obj.transform.position = currentPosition + new Vector3(0f, -50f);
         obj.RandomizeTile();
         LeanTween.move(obj.gameObject, currentPosition, 2f).setEaseOutQuad();
         addTile(obj, x, y, i);
@@ -300,7 +332,7 @@ public class GroundGenerator : MonoBehaviour
         return true;
     }
 
-   public void SetSeason(int season)
+    public void SetSeason(int season)
     {
         Debug.Log("Vuodenaika vaihtui" + season);
         this.season = (Tile.Season)season;

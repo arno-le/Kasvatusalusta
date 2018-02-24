@@ -5,8 +5,11 @@ using UnityEngine;
 public class EntityManager : MonoBehaviour
 {
 
+    public GameObject playerPrefab;
     public List<Tile> tiles;
     public List<GameObject> plants = new List<GameObject>();
+
+    private GameObject playerCharacter;
 
     private int width;
     private int height;
@@ -17,6 +20,18 @@ public class EntityManager : MonoBehaviour
         width = GameObject.FindObjectOfType<GroundGenerator>().islandWidth;
     }
 
+
+    public void SpawnPlayer()
+    {
+        if (playerCharacter)
+        {
+            Debug.LogError("Player is already spawned");
+            return;
+        }
+
+        playerCharacter = Instantiate(playerPrefab, transform, true);
+
+    }
     public void removeAllTiles()
     {
         if (tiles.Count > 0)
