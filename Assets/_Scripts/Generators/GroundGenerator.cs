@@ -24,6 +24,7 @@ public class GroundGenerator : MonoBehaviour
     public int octaves;
     public float persistence;
     public float lacunarity;
+    public Vector2 offset;
 
     public int randomSeed = 1;
 
@@ -108,7 +109,7 @@ public class GroundGenerator : MonoBehaviour
 
     public void GenerateIsland()
     {
-        float[,] noiseMap = Noise.GenerateNoiseMap(bottomWidth, bottomHeight, noiseScale, octaves, persistence, lacunarity);
+        float[,] noiseMap = Noise.GenerateNoiseMap(bottomWidth, bottomHeight, noiseScale, octaves, persistence, lacunarity, offset);
         MeshData newIsland = IslandGenerator.GenerateIslandMesh(noiseMap);
         GetComponent<IslandDisplay>().DrawMesh(newIsland, placeholder);
     }
